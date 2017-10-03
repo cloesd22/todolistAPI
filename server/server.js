@@ -9,6 +9,7 @@ var {user} = require('./models/user');
 
 
 var app = express();
+const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 app.post('/todos',(req,res)=>{
@@ -54,8 +55,35 @@ app.get('/todos/:id',(req,res)=>{
     })
 })
 
-app.listen(3000,()=>{
-    console.log("Server listening on 3000");
+app.delete('/todos/:id',(req,res) => {
+    var id = req.params.id;
+
+    if(!ObjectID.isValid(id))
+    {
+        res.sendStatus(404);
+        console.log("invalid ID request made")
+        return;
+    }
+
+    Todo.findByIdAndRemove(id).then((todo) => {
+
+        if(!todo){
+            res.sendStatus(404);
+            console.log("That entry doesn't exist to delete, please create it to to delete it");
+            return;
+        }
+
+        res.sendStatus(200);
+        console.log("Sucess - Send back" + {todo})
+    }).catch((err) => {
+        res.sendStatus(400);
+        console.log("Error deleting data "+ err);
+    })
+
+})
+
+app.listen(port,()=>{
+    console.log(`Server listening on ${port}`);
 })
 
 module.exports = {app};
