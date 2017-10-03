@@ -39,22 +39,19 @@ app.get('/todos/:id',(req,res)=>{
         return;
     }
 
-    Todo.findById(id).then((result) => {
-        if(!result){
+    Todo.findById(id).then((todo) => {
+        if(!todo){
             res.sendStatus(404);
             console.log("Request made for non existent document")
             return;
         }
-        res.send(result);
-        console.log("Sucess - Send back" + result)
+        res.send({todo});
+        console.log("Sucess - Send back" + {todo})
 
     }).catch((err) => {
         res.sendStatus(400);
         console.log("Failed");
     })
-
-
-
 })
 
 app.listen(3000,()=>{
