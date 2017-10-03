@@ -21,6 +21,14 @@ app.post('/todos',(req,res)=>{
     })
 })
 
+app.get('/todos',(req,res)=>{
+    Todo.find().then((todos) => {
+        res.send({todos});
+    }).catch((err) => {
+        res.send(400,"Error with request");
+    })
+})
+
 app.listen(3000,()=>{
     console.log("Server listening on 3000");
 })
