@@ -9,7 +9,7 @@ const todos = [
     {_id:new ObjectID(),text:'First test todo'},
     {_id:new ObjectID(),text:'Second test todo'},
     {_id:new ObjectID(),text:'Third test todo'},
-    {_id:new ObjectID(),text:'Fourth test todo'}
+    {_id:new ObjectID(),text:'Fourth test todo',completed:true,completedAt:333}
 ]
 
 beforeEach((done) => {
@@ -110,3 +110,70 @@ describe('GET /todos/:id',() => {
     })
 
 })
+
+
+describe('DELETE /todos/:id',() => {
+    it('should remove a todo',(done) => {
+        var hexId = todos[0]._id.toHexString();
+
+        request(app)
+        .delete('/todos/'+hexId)
+        .expect(200)
+        .expect((value) => {
+            expect(value.body.todo._id).toBe(hexId);
+        });
+
+        Todo.findById(hexId).then((data) => {
+            expect(data).toNotExist;
+            done();
+        }).catch((err) => {
+            console.log(err);
+            done(err);
+        })
+
+    })
+})
+
+
+describe('update /todos/:id',() => {
+    it('should update status of a todo to be complete, and change the text',(done) => {
+        
+        var hexID = todos[0]._id.toHexString();
+        
+        request(app)
+        .patch('/todos/'+hexID)
+        .send({text:"Y the test done?",completed:true})
+        .expect(200)
+        .expect((value) => {
+            var returnVariable = JSON.parse(value.res.text);
+            expect(returnVariable.todo.completed).toBe(true);
+            expect(returnVariable.todo.text).toBe("Y the test done?");
+            done();
+        }).catch((err) => {
+            console.log(err)
+            done(err);
+        });
+
+    })
+
+    it('should turn a todo from complete to not complete',(done) => {
+        
+        var hexID = todos[3]._id.toHexString();
+        request(app)
+        .patch('/todos/'+hexID)
+        .send({text:"RevertedStatus",completed:false})
+        .expect(200)
+        .expect((value) => {
+            var returnVariable = JSON.parse(value.res.text).todo;
+            expect(returnVariable.completed).toBe(false);
+            expect(returnVariable.completedAt).toBe(null);
+            expect(returnVariable.text).toBe("RevertedStatus");
+            done();
+        }).catch((e) => {
+            console.log(e);
+            done();
+        })
+
+    })
+
+});
