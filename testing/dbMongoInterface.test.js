@@ -7,7 +7,7 @@ describe('basic connect/insert/find testing', () => {
 
     var db;
     before(() => {
-        db = new interface.mongoCustomDriver("mongodb://localhost:27017/testing");
+        db = new interface.mongoCustomDriver(process.env.MONGODB_URI);
     })
 
     it('dbObject Succesfsuly assigned', (done) => {
